@@ -1,82 +1,106 @@
 class Solution {
 public:
-    double sametime(int n1, int n2, vector<vector<double>> &result, int N) {
+    double sametime(int n1, int n2) {
         if(n1 <= 0 && n2 <= 0)
             return 1;
         else if(n1 <= 0 || n2 <= 0)
             return 0;
-        int x = (N-n1) / 25;
-        int y = (N-n2) / 25;
-        if(result[x][y] >= 0)
-            return result[x][y];
         double p = 0;
         // op1
-        p += sametime(n1-100, n2, result, N);
+        p += sametime(n1-100, n2);
         // op2
         if(n1 <= 75 && n2 <= 25)
             p += 1;
-        else p += sametime(n1-75, n2-25, result, N);
+        else p += sametime(n1-75, n2-25);
         // op3
         if(n1 <= 50 && n2 <= 50)
             p += 1;
-        else p += sametime(n1-50, n2-50, result, N);
+        else p += sametime(n1-50, n2-50);
         // op4
         if(n1 <= 25 && n2 <= 75)
             p += 1;
-        else p += sametime(n1-25, n2-75, result, N);
-        //result.insert(pair<pair<int,int>,double>(key, p));
+        else p += sametime(n1-25, n2-75);
         p = p / 4;
-        result[x][y] = p;
         return p;
     }
-    double afirst(int n1, int n2, vector<vector<double>> &result, int N) {
+    double afirst(int n1, int n2) {
         if(n1 <= 0 && n2 > 0)
             return 1.0;
         else if(n2 <= 0)
             return 0.0;
-        int x = (N-n1) / 25;
-        int y = (N-n2) / 25;
-        if(result[x][y] >= 0)
-            return result[x][y];
         double p = 0;
         // op1
         if(n1 <= 100)
             p += 1;
-        else p += afirst(n1-100, n2, result, N);
+        else p += afirst(n1-100, n2);
         // op2
         if(n1 <= 75 && n2 > 25)
             p += 1;
-        else p += afirst(n1-75, n2-25, result, N);
+        else p += afirst(n1-75, n2-25);
         // op3
         if(n1 <= 50 && n2 > 50)
             p += 1;
-        else p += afirst(n1-50, n2-50, result, N);
+        else p += afirst(n1-50, n2-50);
         // op4
         if(n1 <= 25 && n2 > 75)
             p += 1;
-        else p += afirst(n1-25, n2-75, result, N);
+        else p += afirst(n1-25, n2-75);
         p = p / 4;
-        //result.insert(pair<pair<int,int>,double>(key, p));
-        result[x][y] = p;
         return p;
+    }
+    void recursive_sametime(vector<double> &result, int N) {
+        int t = (result.size() - 4) / 3;
+        if(result.size() < 4)
+            return;
+        int x = N - 100 * t;
+        int y = N;
+        for(int i = 0; i + 3 < result.size(); i++, x += 25, y -= 25) {
+            if(x <= 0 && y <= 0)
+                result[i] = 1;
+            else if(x <= 0 || y <= 0)
+                result[i] = 0;
+            else {
+                double sum = result[i] + result[i+1] + result[i+2] + result[i+3];
+                result[i] = sum / 4;
+            }
+        }
+        result.erase(result.begin() + result.size() - 3, result.end());
+    }
+    void recursive_afirst(vector<double> &result, int N) {
+        int t = (result.size() - 4) / 3;
+        if(result.size() < 4)
+            return;
+        int x = N - 100 * t;
+        int y = N;
+        for(int i = 0; i + 3 < result.size(); i++, x += 25, y -= 25) {
+            if(x <= 0 && y > 0)
+                result[i] = 1;
+            else if(y <= 0)
+                result[i] = 0;
+            else {
+                double sum = result[i] + result[i+1] + result[i+2] + result[i+3];
+                result[i] = sum / 4;
+            }
+        }
+        result.erase(result.begin() + result.size() - 3, result.end());
     }
     double soupServings(int N) {
         int times = N / 50;
         //if(N % 50 != 0) times++;
-        vector<vector<double>> result1(N/25, vector<double>(N/25, -1.0));
-        vector<vector<double>> result2(N/25, vector<double>(N/25, -1.0));
-        while(times > 0) {
-            int i = 4 * times - N / 25;
-            if(i < 0) i = 0;
-            int x = N - 100 * times + 25 * i, y = N - 25 * i;
-            for(; i <= 3 * times && y > 0; i++, x += 25, y -= 25) {
-                if(x <= 0)
-                    continue;
-                afirst(x, y, result1, N);
-                sametime(x, y, result2, N);
-            }
-            times--;
+        vector<double> result1(3*times + 1, 0);
+        vector<double> result2(3*times + 1, 0);
+        int x = N - 100 * times;
+        int y = N;
+        for(int i = 0; i <= 3 * times; i++, x += 25, y -= 25) {
+            result1[i] = afirst(x, y);
+            result2[i] = sametime(x, y);
         }
-        return afirst(N, N, result1, N) + sametime(N, N, result2, N) / 2;
+        while(result1.size() > 1) {
+            recursive_afirst(result1, N);
+        }
+        while(result2.size() > 1) {
+            recursive_sametime(result2, N);
+        }
+        return result1[0] + result2[0] / 2;
     }
 };
