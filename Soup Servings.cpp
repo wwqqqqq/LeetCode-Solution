@@ -52,9 +52,14 @@ public:
         int t = (result.size() - 4) / 3;
         if(result.size() < 4)
             return;
-        int x = N - 100 * t;
-        int y = N;
-        for(int i = 0; i + 3 < result.size(); i++, x += 25, y -= 25) {
+        int i = 4 * t - N / 25 - 3;
+        if(i < 0) i = 0;
+        int ed = N / 25 + 3;
+        if(ed > 3 * t) ed = 3 * t;
+        if(ed > result.size() - 3) ed = result.size() - 3;
+        int x = N - 100 * t + 25 * i;
+        int y = N - 25 * i;
+        for(; i < ed; i++, x += 25, y -= 25) {
             if(x <= 0 && y <= 0)
                 result[i] = 1;
             else if(x <= 0 || y <= 0)
@@ -70,9 +75,14 @@ public:
         int t = (result.size() - 4) / 3;
         if(result.size() < 4)
             return;
-        int x = N - 100 * t;
-        int y = N;
-        for(int i = 0; i + 3 < result.size(); i++, x += 25, y -= 25) {
+        int i = 4 * t - N / 25 - 3;
+        if(i < 0) i = 0;
+        int ed = N / 25 + 3;
+        if(ed > 3 * t) ed = 3 * t;
+        if(ed > result.size() - 3) ed = result.size() - 3;
+        int x = N - 100 * t + 25 * i;
+        int y = N - 25 * i;
+        for(; i < ed; i++, x += 25, y -= 25) {
             if(x <= 0 && y > 0)
                 result[i] = 1;
             else if(y <= 0)
