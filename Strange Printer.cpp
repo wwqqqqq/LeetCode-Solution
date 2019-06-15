@@ -1,7 +1,3 @@
-// 有一种情况没有考虑到，即后打印上的文字可以覆盖先前的有效文字
-// 只要之后再重新打印上被覆盖的文字，还是有可能做到打印次数最小
-// 如字符串"tabtbat"，先打印"ttttttt"，使用a覆盖 "taaaaat"，使用b覆盖 "tabbbat"，再补上中间的t，只需要4步。
-// 但以我的算法得到的结果确需要5步。
 class Solution {
 public:
     vector<string> strSplit(string s, char delimiter) {
@@ -25,6 +21,30 @@ public:
         result.push_back(s.substr(beg, i - beg));
         return result;
     }
+    int strangePrinter(vector<string> &pieces, int beg, char delimiter, map<string, int> &m1, map<int,int> &m2, bool all) {
+        if(beg >= pieces.size())
+            return 0;
+        if(pieces.size() - beg == 1)
+            return strangePrinter(pieces[beg], m1);
+        auto iter = m2.find(beg);
+        if(iter != m2.end())
+            return iter->second;
+        string s = pieces[beg];
+        int min = strangePrinter(s, m1) + strangePrinter(pieces, beg + 1, delimiter, m1, m2, true);
+        int ed = pieces.size();
+        if(beg == 0 && !all)
+            ed = pieces.size() - 1;
+        for(int i = beg + 1; i < ed; i++) {
+            s.append(1, delimiter);
+            s.append(pieces[i]);
+            int result = strangePrinter(s, m1);
+            if(result >= min) continue;
+            result += strangePrinter(pieces, i+1, delimiter, m1, m2, true);
+            if(result < min) min = result;
+        }
+        m2.insert(pair<int,int>(beg, min));
+        return min;
+    }
     int strangePrinter(string s, map<string, int> &m) {
         if(s.size() == 1) return 1;
         if(s.size() == 0) return 0;
@@ -44,11 +64,12 @@ public:
             char c = *iter;
             int sum = 1;
             vector<string> strs = strSplit(s, c);
-            for(int i = 0; i < strs.size(); i++) {
-                sum += strangePrinter(strs[i], m);
-                if(sum >= min)
-                    break;
-            }
+            map<int,int> m2;
+            bool all = false;
+            if(s[0] == c || s[s.size()-1] == c)
+                all = true;
+            sum += strangePrinter(strs, 0, c, m, m2, all);
+            m2.erase(m2.begin(), m2.end());
             if(sum < min) min = sum;
         }
         m.insert(pair<string, int>(s, min));
