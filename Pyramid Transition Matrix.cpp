@@ -52,10 +52,10 @@ public:
                         t.append(1, allowed[k]);
                         new_upper.push_back(t);
                     }
-                    if(new_upper.size() == 0)
-                        return false;
-                    upper = new_upper;
                 }
+                if(new_upper.size() == 0)
+                    return false;
+                upper = new_upper;
             }
         }
         for(int i = 0; i < upper.size(); i++)
