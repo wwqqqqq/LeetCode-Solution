@@ -49,54 +49,49 @@ public:
         }
         return false;
     }
-    int dfs(vector<vector<int>> &graph, vector<int> & group, int group_id, int root) {
-        int size = group.size();
-        stack<int> nodes;
-        int count = 0;
-        nodes.push(root);
-        while(nodes.size() > 0) {
-            int p = nodes.top();
-            nodes.pop();
-            if(group[p] != -1)
-                continue;
-            group[p] = group_id;
-            count++;
-            for(int i = 0; i < size; i++) {
-                if(graph[p][i] == 1 && group[i] == -1)
-                    nodes.push(i);
-            }
-        }
-        return count;
-    }
     int largestComponentSize(vector<int>& A) {
         if(A.size() <= 1)
             return A.size();
-        vector<vector<int>> graph(A.size(), vector<int>(A.size(), 0));
         int max_n = 0;
         for(int i = 0; i < A.size(); i++) {
             if(max_n < A[i]) max_n = A[i];
         }
         getPrimes(max_n);
         getFactors(A);
-        for(int i = 0; i < A.size(); i++) {
-            graph[i][i] = 1;
-            for(int j = i + 1; j < A.size(); j++) {
-                if(commonFactor(i, j)) {
-                    graph[i][j] = 1;
-                    graph[j][i] = 1;
+        vector<int> group(A.size(), 0);
+        group[0] = 1;
+        vector<int> visited = {0};
+        int group_id = 2;
+        for(int i = 1; i < A.size(); i++) {
+            for(int j = 0; j < visited.size(); j++) {
+                if(group[i] == group[visited[j]])
+                    continue;
+                if(commonFactor(i, visited[j])) {
+                    if(group[i] == 0) {
+                        group[i] = group[visited[j]];
+                        visited.push_back(i);
+                    }
+                    else {
+                        for(auto iter = visited.begin(); iter != visited.end(); iter++)
+                            if(group[*iter] == group[visited[j]])
+                                group[*iter] = group[i];
+                    }
                 }
             }
+            if(group[i] == 0) {
+                group[i] = group_id;
+                group_id++;
+                visited.push_back(i);
+            }
         }
-        vector<int> group(A.size(), -1);
+        vector<int> group_size(group_id, 0);
         int max = 0;
-        int group_id = 1;
         for(int i = 0; i < A.size(); i++) {
-            if(group[i] != -1)
-                continue;
-            int count = dfs(graph, group, group_id, i);
-            if(count > max) max = count;
-            group_id = group_id + 1;
+            group_size[group[i]]++;
+            if(group_size[group[i]] > max) max = group_size[group[i]];
         }
+        for(int i = 0; i < group_size.size(); i++)
+            if(max < group_size[i]) max = group_size[i];
         return max;
     }
 };
