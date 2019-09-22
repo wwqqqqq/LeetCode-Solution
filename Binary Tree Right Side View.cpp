@@ -7,7 +7,7 @@
  *     TreeNode(int x) : val(x), left(NULL), right(NULL) {}
  * };
  */
-class Solution {
+class Solution { 
 public:
     vector<int> rightSideView(TreeNode* root) {
         vector<int> result;
