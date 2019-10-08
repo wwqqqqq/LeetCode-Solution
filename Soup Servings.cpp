@@ -1,116 +1,64 @@
 class Solution {
 public:
-    double sametime(int n1, int n2) {
-        if(n1 <= 0 && n2 <= 0)
+    double soupServings(int A, int B, map<pair<int,int>, double>& m) {
+        if(A <= 0 && B <= 0)
+            return 0.5;
+        if(A <= 0 && B > 0)
             return 1;
-        else if(n1 <= 0 || n2 <= 0)
+        else if(B <= 0)
             return 0;
-        double p = 0;
-        // op1
-        p += sametime(n1-100, n2);
-        // op2
-        if(n1 <= 75 && n2 <= 25)
-            p += 1;
-        else p += sametime(n1-75, n2-25);
-        // op3
-        if(n1 <= 50 && n2 <= 50)
-            p += 1;
-        else p += sametime(n1-50, n2-50);
-        // op4
-        if(n1 <= 25 && n2 <= 75)
-            p += 1;
-        else p += sametime(n1-25, n2-75);
-        p = p / 4;
-        return p;
+        pair<int,int> key(A, B);
+        auto iter = m.find(key);
+        if(iter != m.end())
+            return iter->second;
+        double result = (soupServings(A-100,B,m) +
+                         soupServings(A-75,B-25,m) +
+                         soupServings(A-50,B-50,m) +
+                         soupServings(A-25,B-75,m)) * 0.25;
+        m.insert(pair<pair<int,int>,double>(key,result));
+        return result;
     }
-    double afirst(int n1, int n2) {
-        if(n1 <= 0 && n2 > 0)
-            return 1.0;
-        else if(n2 <= 0)
-            return 0.0;
-        double p = 0;
-        // op1
-        if(n1 <= 100)
-            p += 1;
-        else p += afirst(n1-100, n2);
-        // op2
-        if(n1 <= 75 && n2 > 25)
-            p += 1;
-        else p += afirst(n1-75, n2-25);
-        // op3
-        if(n1 <= 50 && n2 > 50)
-            p += 1;
-        else p += afirst(n1-50, n2-50);
-        // op4
-        if(n1 <= 25 && n2 > 75)
-            p += 1;
-        else p += afirst(n1-25, n2-75);
-        p = p / 4;
-        return p;
+    /*double soupServings1(int A, int B, map<pair<int,int>, double>& m) {
+        if(A <= 0 && B > 0)
+            return 1;
+        else if(B <= 0)
+            return 0;
+        pair<int,int> key(A, B);
+        auto iter = m.find(key);
+        if(iter != m.end())
+            return iter->second;
+        double result = (soupServings1(A-100,B,m) +
+                         soupServings1(A-75,B-25,m) +
+                         soupServings1(A-50,B-50,m) +
+                         soupServings1(A-25,B-75,m)) * 0.25;
+        m.insert(pair<pair<int,int>,double>(key,result));
+        return result;
     }
-    void recursive_sametime(vector<double> &result, int N) {
-        int t = (result.size() - 4) / 3;
-        if(result.size() < 4)
-            return;
-        int i = 4 * t - N / 25 - 3;
-        if(i < 0) i = 0;
-        int ed = N / 25 + 3;
-        if(ed > 3 * t) ed = 3 * t;
-        if(ed > result.size() - 3) ed = result.size() - 3;
-        int x = N - 100 * t + 25 * i;
-        int y = N - 25 * i;
-        for(; i < ed; i++, x += 25, y -= 25) {
-            if(x <= 0 && y <= 0)
-                result[i] = 1;
-            else if(x <= 0 || y <= 0)
-                result[i] = 0;
-            else {
-                double sum = result[i] + result[i+1] + result[i+2] + result[i+3];
-                result[i] = sum / 4;
-            }
-        }
-        result.erase(result.begin() + result.size() - 3, result.end());
-    }
-    void recursive_afirst(vector<double> &result, int N) {
-        int t = (result.size() - 4) / 3;
-        if(result.size() < 4)
-            return;
-        int i = 4 * t - N / 25 - 3;
-        if(i < 0) i = 0;
-        int ed = N / 25 + 3;
-        if(ed > 3 * t) ed = 3 * t;
-        if(ed > result.size() - 3) ed = result.size() - 3;
-        int x = N - 100 * t + 25 * i;
-        int y = N - 25 * i;
-        for(; i < ed; i++, x += 25, y -= 25) {
-            if(x <= 0 && y > 0)
-                result[i] = 1;
-            else if(y <= 0)
-                result[i] = 0;
-            else {
-                double sum = result[i] + result[i+1] + result[i+2] + result[i+3];
-                result[i] = sum / 4;
-            }
-        }
-        result.erase(result.begin() + result.size() - 3, result.end());
-    }
+    double soupServings2(int A, int B, map<pair<int,int>, double>& m) {
+        if(A <= 0 && B <= 0)
+            return 1;
+        else if(B <= 0 || A <= 0)
+            return 0;
+        pair<int,int> key(A, B);
+        auto iter = m.find(key);
+        if(iter != m.end())
+            return iter->second;
+        double result = (soupServings2(A-100,B,m) +
+                         soupServings2(A-75,B-25,m) +
+                         soupServings2(A-50,B-50,m) +
+                         soupServings2(A-25,B-75,m)) * 0.25;
+        m.insert(pair<pair<int,int>,double>(key,result));
+        return result;
+    }*/
     double soupServings(int N) {
-        int times = N / 50;
-        //if(N % 50 != 0) times++;
-        vector<double> result1(3*times + 1, 0);
-        vector<double> result2(3*times + 1, 0);
-        int x = N - 100 * times;
-        int y = N;
-        for(int i = 0; i <= 3 * times; i++, x += 25, y -= 25) {
-            result1[i] = afirst(x, y);
-            result2[i] = sametime(x, y);
-        }
-        while(result1.size() > 1) {
-            recursive_afirst(result1, N);
-        }
-        while(result2.size() > 1) {
-            recursive_sametime(result2, N);
-        }
-        return result1[0] + result2[0] / 2;
+        if(N > 5000)
+            return 1;
+        /*map<pair<int,int>,double> results1;
+        map<pair<int,int>,double> results2;
+        double r1 = soupServings1(N, N, results1);
+        double r2 = soupServings2(N, N, results2) / 2.0;
+        return r1 + r2;*/
+        map<pair<int,int>,double> results;
+        return soupServings(N, N, results);
     }
 };
