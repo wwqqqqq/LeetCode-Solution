@@ -68,3 +68,62 @@ public:
             return -((1 << i) + divide(dividend - n + carry, divisor));
     }
 };
+
+
+/*
+class Solution {
+public:
+    int divide(int dividend, int divisor) {
+        // the divisor will not be 0
+        int sign = 1;
+        // before turn divident and divisor into a positive number
+        // we must consider the corner case: they may equal to INT_MIN
+        // -INI_MIN will be out of range of an integer
+        int result = 0;
+        //int intMin = -2147483648‬;
+        if(divisor == INT_MIN) {
+            if(dividend == INT_MIN)
+                return 1;
+            return 0;
+        }
+        if(divisor < 0) {
+            sign = -sign;
+            divisor = -divisor;
+        }
+        // now divisor is a positive number
+        if(dividend == INT_MIN) {
+            if(sign * divisor == -1)
+                return INT_MAX;
+            if(sign * divisor == 1)
+                return INT_MIN;
+            result = 1;
+            dividend += divisor;
+        }
+        if(dividend < 0) {
+            sign = -sign;
+            dividend = -dividend;
+        }
+        vector<int> pow2;
+        vector<int> pow2timesd;
+        int current = divisor;
+        int coefficient = 1;
+        while(current <= dividend) {
+            pow2.push_back(coefficient);
+            pow2timesd.push_back(current);
+            if(current > dividend - current)
+                break;
+            current = current * 2;
+            coefficient = coefficient * 2;
+        }
+        for(int i = pow2timesd.size()-1; i >= 0; i--) {
+            if(dividend >= pow2timesd[i]) {
+                dividend -= pow2timesd[i];
+                result += pow2[i];
+            }
+            if(dividend == 0)
+                break;
+        }
+        return sign * result;
+    }
+};
+*/
