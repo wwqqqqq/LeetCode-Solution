@@ -1,38 +1,56 @@
 class Solution {
 public:
+    int getIndent(string input) {
+        int count = 0;
+        for(int i = 0; i < input.size(); i++) {
+            if(input[i] != '\t')
+                break;
+            count++;
+        }
+        return count;
+    }
+    bool isfile(string input) {
+        if(input.size() == 0)
+            return false;
+        if(input.find('.') == input.npos)
+            return false;
+        return true;
+    }
     int lengthLongestPath(string input) {
-        stack<string> st;
+        vector<string> name;
         int max = 0;
-        //int max_depth = 0;
-        int len = 0;
-        for(int i = 0; i < input.size();) {
-            if(input[i] == '\n')
-                continue;
-            int j = i;
-            int depth = 1;
-            bool isfile = false;
-            for(; j < input.size(); j++) {
-                if(input[j] == '\t') {
-                    depth++;
-                    i++;
-                }
-                else if(input[j] == '.')
-                    isfile = true;
-                else if(input[j] == '\n')
-                    break;
+        int count = 0;
+        while(input.size() > 0) {
+            int nl = input.find('\n');
+            int indent;
+            string temp;
+            if(nl == input.npos) {
+                indent = getIndent(input);
+                temp = input;
+                input = "";
             }
-            string s = input.substr(i, j-i);
-            while(st.size() >= depth) {
-                len -= (st.top()).size();
-                st.pop();
+            else {
+                temp = input.substr(0, nl);
+                input = input.substr(nl+1);
+                indent = getIndent(temp);
             }
-            st.push(s);
-            len += s.size();
-            if(isfile && max < len + depth - 1)
-                max = len + depth - 1;
-            /*if(depth > max_depth)
-                max_depth = depth;*/
-            i = j + 1;
+
+            while(name.size() >= indent + 1) {
+                string t1 = name[name.size()-1];
+                count = count - t1.size();
+                name.erase(name.end()-1);
+            }
+            temp.erase(temp.begin(),temp.begin()+indent);
+            if(isfile(temp)) {
+                count += temp.size();
+                if(count > max)
+                    max = count;
+            }
+            else {
+                temp.append("/");
+                count += temp.size();
+            }
+            name.push_back(temp);
         }
         return max;
     }
