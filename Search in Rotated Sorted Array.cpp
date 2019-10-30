@@ -1,27 +1,20 @@
 class Solution {
 public:
-    int search(vector<int>& nums, int target, int st, int ed, int pivot) {
+    int search(vector<int>& nums, int target, int st, int ed) {
         if(st == ed) {
             if(nums[st] == target)
                 return st;
             else return -1;
         }
-        if(nums[st] > nums[ed])
-            return -1;
-        int mid = st + ed;
         if(st > ed)
-            mid += nums.size();
-        mid = (mid / 2) % (nums.size());
+            return -1;
+        int mid = (st + ed) / 2;
         if(nums[mid] == target)
             return mid;
         else if(nums[mid] > target) {
-            if(mid == pivot)
-                return -1;
-            return search(nums, target, st, (mid-1+nums.size()) % (nums.size()), pivot); // in case mid == 0
+            return search(nums, target, st, mid-1); 
         }
-        if((mid + 1) % (nums.size()) == pivot)
-            return -1;
-        return search(nums, target, (mid+1) % (nums.size()), ed, pivot);
+        return search(nums, target, mid+1, ed);
     }
     int search(vector<int>& nums, int target) {
         if(nums.size() == 0)
@@ -33,8 +26,13 @@ public:
                 break;
             }
         }
-        int st = i % (nums.size()); // in case i == nums.size()
-        int ed = i - 1; // >= 0
-        return search(nums, target, st, ed, st);
+        if(i == nums.size())
+            i = 0;
+        if(nums[nums.size()-1] == target)
+            return nums.size()-1;
+        else if(nums[nums.size()-1] < target) {
+            return search(nums, target, 0, i-1);
+        }
+        return search(nums, target, i, nums.size()-2);
     }
 };
