@@ -1,61 +1,47 @@
 class Solution {
 public:
-    bool DFS(vector<vector<int>>& graph, int v, int b, int n, set<int>& visited) {
-        for(int i = 0; i < n; i++) {
+    bool DFS(vector<vector<int>>& graph, vector<set<int>>& edgeList, int v, int b, int n, set<int>& visited) {
+        if(v == b) {
+            return true;
+        }
+        if(edgeList[v].find(b) != edgeList[v].end()) {
+            graph[v][b] = 2;
+            graph[b][v] = 2;
+            return true;
+        }
+        for(auto iter = edgeList[v].begin(); iter != edgeList[v].end(); iter++) {
+            int i = *iter;
             if(graph[v][i] > 0) {
-                if(i == b) {
-                    graph[v][b] = 2;
-                    graph[b][v] = 2;
-                    return true;
-                }
                 if(visited.find(i) != visited.end())
                     continue;
-                int t = graph[v][i];
-                graph[v][i] = 2;
-                graph[i][v] = 2;
                 visited.insert(i);
-                if(DFS(graph, i, b, n, visited))
+                if(i == b || DFS(graph, edgeList, i, b, n, visited)) {
+                    graph[v][i] = 2;
+                    graph[i][v] = 2;
                     return true;
-                graph[v][i] = t;
-                graph[i][v] = t;
+                }
             }
         }
         return false;
     }
-    bool canAccess(vector<vector<int>>& graph, int a, int b, int n) {
+    bool canAccess(vector<vector<int>>& graph, vector<set<int>>& edgeList, int a, int b, int n) {
         // return is the path exists.
         // if path exists, find the path, and mark every edge on the path '2' on the graph
         // use DFS
         set<int> visited;
-        return DFS(graph, a, b, n, visited);
-        /*// use BFS
-        queue<int> nodes;
-        set<int> visited;
-        nodes.push(a);
-        while(nodes.size() > 0) {
-            int v = nodes.front();
-            nodes.pop();
-            visited.insert(v);
-            for(int i = 0; i < n; i++) {
-                if(graph[v][i] == 1) {
-                    if(i == b)
-                        return true;
-                    if(visited.find(i) != visited.end())
-                        continue;
-                    nodes.push(i);
-                }
-            }
-        }*/
-        return false;
+        return DFS(graph, edgeList, a, b, n, visited);
     }
     vector<vector<int>> criticalConnections(int n, vector<vector<int>>& connections) {
         vector<vector<int>> graph(n, vector<int>(n, 0));
+        vector<set<int>> edgeList(n, set<int>());
         vector<vector<int>> result;
         for(int i = 0; i < connections.size(); i++) {
             int v1 = connections[i][0];
             int v2 = connections[i][1];
             graph[v1][v2] = 1;
             graph[v2][v1] = 1;
+            edgeList[v1].insert(v2);
+            edgeList[v2].insert(v1);
         }
         for(int i = 0; i < connections.size(); i++) {
             int v1 = connections[i][0];
@@ -64,12 +50,19 @@ public:
                 continue;
             graph[v1][v2] = 0;
             graph[v2][v1] = 0;
-            if(!canAccess(graph, v1, v2, n)) {
-                vector<int> temp = {v1, v2};
-                result.push_back(temp);
+            edgeList[v1].erase(v2);
+            edgeList[v2].erase(v1);
+            if(!canAccess(graph, edgeList, v1, v2, n)) {
+                result.push_back({v1, v2});
+                graph[v1][v2] = 1;
+                graph[v2][v1] = 1;
             }
-            graph[v1][v2] = 1;
-            graph[v2][v1] = 1;
+            else {
+                graph[v1][v2] = 2;
+                graph[v2][v1] = 2;
+            }
+            edgeList[v1].insert(v2);
+            edgeList[v2].insert(v1);
         }
         return result;
     }
