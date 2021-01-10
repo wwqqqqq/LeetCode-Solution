@@ -17,11 +17,11 @@ public:
                 return false;
             }
             if (tx > ty) {
-                int n = ceilDivide(tx - max(ty,sx), ty);
+                int n = max(ceilDivide(tx - max(ty,sx), ty), 1);
                 tx = tx - ty * n;
             }
             else if (ty > tx) {
-                int n = ceilDivide(ty - max(tx,sy), tx);
+                int n = max(ceilDivide(ty - max(tx,sy), tx), 1);
                 ty = ty - tx * n;
             }
             else {
