@@ -1,16 +1,5 @@
 class Solution {
 public:
-    int min(int a, int b) {
-        return (a < b) ? a : b;
-    }
-    bool directConnected(int a, int b, int threshold) {
-        for (int z = min(a,b); z > threshold; z--) {
-            if (a % z == 0 && b % z == 0) {
-                return true;
-            }
-        }
-        return false;
-    }
     void dfs(int node, int label, vector<vector<int>>& neighbors, vector<int>& labels) {
         if (node < 1 || node >= neighbors.size() || labels[node] >= 0) {
             return;
@@ -23,12 +12,10 @@ public:
     vector<bool> areConnected(int n, int threshold, vector<vector<int>>& queries) {
         vector<vector<int>> neighbors(n+1, vector<int>());
         // generate connected relationship
-        for (int i = 1; i <= n; i++) {
-            for (int j = 1; j <= n; j++) {
-                if (directConnected(i, j, threshold)) {
-                    neighbors[i].push_back(j);
-                    neighbors[j].push_back(i);
-                }
+        for (int i = threshold + 1; i <= n; i++) {
+            for (int j = 2; i * j <= n; j++) {
+                neighbors[i].push_back(i*j);
+                neighbors[i*j].push_back(i);
             }
         }
         // find connected components
